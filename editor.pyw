@@ -18,17 +18,15 @@ def delete_word_backwards(self):
 
     if word_start==cursor_position:
         word_start= 0.0
-    
+       
+    word_start= text.index(f"{word_start}+2c") # Move word_start one character forward
 
-
-    
     text.delete(word_start, cursor_position)
 
-    #word_start= text.index(f"{word_start}+1c") # Move word_start one character forward
 
 def center_window(window):
-    window_width = 500
-    window_height = 300
+    window_width = 1000
+    window_height = 600
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
     x = (screen_width - window_width) // 2
@@ -93,6 +91,15 @@ def add_bullets():
     # Replace the selected text with the formatted text
     text.replace(tk.SEL_FIRST, tk.SEL_LAST, formatted_text)
 
+def add_tabs():
+    # Get the selected text
+    selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+    
+    # Add tabs to non-empty lines
+    formatted_text = "\n".join(["\t" + line if line.strip() != "" else line for line in selected_text.split("\n")])
+    # Replace the selected text with the formatted text
+    text.replace(tk.SEL_FIRST, tk.SEL_LAST, formatted_text)
+
 
 def capitalize_first_letter_of_each_line(selected_text):
     if selected_text:
@@ -105,13 +112,14 @@ def capitalize_first_letter_of_each_line(selected_text):
         return capitalized_text
 
 
-
-
-
-
 # Create the main window
 root = tk.Tk()
 root.title("Editor")
+
+#def minimize_window():
+#    root.iconify()  # Minimize the window
+# Bind the minimize_window function to the WM_DELETE_WINDOW protocol
+#root.protocol("WM_DELETE_WINDOW", minimize_window) # Minimize the window
 
 # Make the window resizable
 root.resizable(True, True)
@@ -140,16 +148,16 @@ file_menu.add_command(label="Exit", command=root.quit)
 edit_menu = tk.Menu(menu, tearoff=False)
 menu.add_cascade(label="Edit", menu=edit_menu)
 edit_menu.add_command(label="Capitalize Every Word", command=capitalize_selected_text)
-edit_menu.add_command(label="Bullets", command=add_bullets)
-edit_menu.add_separator()
-edit_menu.add_command(label="Find and Replace", command=lambda: find_replace.open_find_replace(root, text))
+edit_menu.add_command(label="Insert Bullets", command=add_bullets)
+edit_menu.add_command(label="Insert Tabs", command=add_tabs)
+# edit_menu.add_separator()
+# edit_menu.add_command(label="Find and Replace", command=lambda: find_replace.open_find_replace(root, text))
 
 
 # Bind hotkeys
 text.bind("<Control-s>", save_file)
 text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
-
 
 # Create a toolbar
 toolbar = tk.Frame(root)
