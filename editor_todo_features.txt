@@ -1,0 +1,24 @@
+# Features
+- Font: Consolas Regular 11
+- Open Hotkey (Ctrl + O)
+- Save Hotkey (Ctrl + S)
+- File name in title bar
+- Captialize Every Word In Selection
+- Ctrl+backspace to delete entire word
+- Insert tab at beginning of selected lines
+- Change name to Text Tools
+- Make it so that users can insert any bullets for a selection
+- Replace edit menu with command palette
+
+# Notes
+- Text widget has some default bindings that interfere
+- Had to make the width and height of text widget 1000, otherwise wouldn't resize properly.
+
+# Todo
+T press backspace to delete word
+X Save as when starting a new file
+T "New" file menu
+T propmpt before closing (like search.pyw)
+
+
+
