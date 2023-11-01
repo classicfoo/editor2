@@ -7,6 +7,13 @@ import find_replace
 
 current_file_path = None  # Initialize current_file_path as None
 
+def new_file():
+    global current_file_path
+    text.delete(1.0, tk.END)  # Clear the current text widget
+    root.title("Editor")  # Reset the window title
+    current_file_path = None  # Reset the current file path
+
+
 def delete_word_backwards(self):
     cursor_position = text.index("insert")
 
@@ -139,6 +146,7 @@ root.config(menu=menu)
 # File menu
 file_menu = tk.Menu(menu, tearoff=False)
 menu.add_cascade(label="File", menu=file_menu)
+file_menu.add_command(label="New", command=new_file)  # Add a "New" menu item
 file_menu.add_command(label="Open", command=open_file, accelerator="Ctrl+O")
 file_menu.add_command(label="Save", command=save_file, accelerator="Ctrl+S")
 file_menu.add_separator()

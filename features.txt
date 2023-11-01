@@ -1,0 +1,16 @@
+# Features
+- Font: Consolas Regular 11
+- Open Hotkey (Ctrl + O)
+- Save Hotkey (Ctrl + S)
+- File name in title bar
+- Captialize Every Word In Selection
+
+# Notes
+- Text widget has some default bindings that interfere
+- Had to make the width and height of text widget 1000, otherwise wouldn't resize properly.
+
+# Todo
+X Save as when starting a new file
+X "New" file menu
+
+
