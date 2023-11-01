@@ -17,7 +17,7 @@
 # Todo
 T press backspace to delete word
 X Save as when starting a new file
-T "New" file menu
+X "New" file menu
 T propmpt before closing (like search.pyw)
 
 
