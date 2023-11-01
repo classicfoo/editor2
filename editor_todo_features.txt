@@ -15,7 +15,7 @@
 - Had to make the width and height of text widget 1000, otherwise wouldn't resize properly.
 
 # Todo
-T press backspace to delete word
+X press backspace to delete word
 X Save as when starting a new file
 X "New" file menu
 T propmpt before closing (like search.pyw)
