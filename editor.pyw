@@ -7,7 +7,7 @@ import find_replace
 
 current_file_path = None  # Initialize current_file_path as None
 
-def new_file():
+def new_file(event=None):
     global current_file_path
     text.delete(1.0, tk.END)  # Clear the current text widget
     root.title("Editor")  # Reset the window title
@@ -146,7 +146,7 @@ root.config(menu=menu)
 # File menu
 file_menu = tk.Menu(menu, tearoff=False)
 menu.add_cascade(label="File", menu=file_menu)
-file_menu.add_command(label="New", command=new_file)  # Add a "New" menu item
+file_menu.add_command(label="New", command=new_file, accelerator="Ctrl+N")  # Add a "New" menu item
 file_menu.add_command(label="Open", command=open_file, accelerator="Ctrl+O")
 file_menu.add_command(label="Save", command=save_file, accelerator="Ctrl+S")
 file_menu.add_separator()
@@ -163,6 +163,7 @@ edit_menu.add_command(label="Insert Tabs", command=add_tabs)
 
 
 # Bind hotkeys
+text.bind("<Control-n>", new_file)
 text.bind("<Control-s>", save_file)
 text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
