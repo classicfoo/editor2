@@ -3,7 +3,6 @@ from tkinter import filedialog
 import re
 import os
 import sys
-import find_replace
 
 current_file_path = None  # Initialize current_file_path as None
 
@@ -58,11 +57,34 @@ def save_file(event=None):
         with open(current_file_path, 'w') as file:
             file.write(text.get(1.0, tk.END))
     else:
-        save_as_file()  # If current_file_path is not defined, use "Save As"
+        # Check if the first line of the text starts with '#'
+        first_line = text.get(1.0, 1.0 + len("#") + 1)  # Get the first line
+        if first_line.strip().startswith('#'):
+            # Extract the suggested file name, convert to lowercase, replace spaces with underscores, and remove hashtags
+            suggested_file_name = first_line.replace('#', '').strip().replace(' ', '_').lower()
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt", initialfile=suggested_file_name)
+        else:
+            file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+        
+        if file_path:
+            with open(file_path, 'w') as file:
+                file.write(text.get(1.0, tk.END))
+            # Get the file name from the file path
+            file_name = os.path.basename(file_path)
+            root.title(f"{file_name} - Editor")
+            current_file_path = file_path  # Update current_file_path
 
 def save_as_file():
     global current_file_path
-    file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+    # Check if the first line of the text starts with '#'
+    first_line = text.get(1.0, 1.0 + len("#") + 1)  # Get the first line
+    if first_line.strip().startswith('#'):
+        # Extract the suggested file name, convert to lowercase, replace spaces with underscores, and remove hashtags
+        suggested_file_name = first_line.replace('#', '').strip().replace(' ', '_').lower()
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt", initialfile=suggested_file_name)
+    else:
+        file_path = filedialog.asksaveasfilename(defaultextension=".txt")
+    
     if file_path:
         with open(file_path, 'w') as file:
             file.write(text.get(1.0, tk.END))
@@ -70,6 +92,8 @@ def save_as_file():
         file_name = os.path.basename(file_path)
         root.title(f"{file_name} - Editor")
         current_file_path = file_path  # Update current_file_path
+
+
 
 def capitalize_selected_text():
     # Get the selected text
