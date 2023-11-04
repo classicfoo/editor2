@@ -18,7 +18,12 @@
 X press backspace to delete word
 X Save as when starting a new file
 X "New" file menu
-T propmpt before closing (like search.pyw)
-
-
-
+X file name suggestion - when saving a file
+	X check the first line, if it starts with #
+	X then use that line as the filename in filedialog when saving a file
+	X convert the filename to lowercase
+	X convert spaces to underscores
+T prompt before closing (like search.pyw)
+T format markdown document
+	T for any headings, capitalize every first letter of every word
+	T apply sentence case for paragraphs
