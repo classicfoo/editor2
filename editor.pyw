@@ -3,8 +3,30 @@ from tkinter import filedialog
 import re
 import os
 import sys
+from tkinterdnd2 import DND_FILES, TkinterDnD
+
 
 current_file_path = None  # Initialize current_file_path as None
+
+def open_dropped_text_file(event):
+    global current_file_path
+    file_path = event.data
+    if file_path:
+        with open(file_path, 'r') as file:
+            text.delete(1.0, tk.END)  # Clear the current content
+            text.insert(tk.END, file.read())  # Insert file content into the Text widget
+        current_file_path = file_path
+        file_name = os.path.basename(file_path)
+        root.title(f"{file_name} - Editor")
+
+
+def change_cursor(event):
+    event.widget.config(cursor="copy")
+
+def reset_cursor(event):
+    event.widget.config(cursor="")
+
+
 
 def new_file(event=None):
     global current_file_path
@@ -144,7 +166,7 @@ def capitalize_first_letter_of_each_line(selected_text):
 
 
 # Create the main window
-root = tk.Tk()
+root = TkinterDnD.Tk()
 root.title("Editor")
 
 #def minimize_window():
@@ -191,6 +213,13 @@ text.bind("<Control-n>", new_file)
 text.bind("<Control-s>", save_file)
 text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
+
+
+
+# Register the Text widget as a drop target for text files
+text.drop_target_register(DND_FILES)
+text.dnd_bind('<<Drop>>', open_dropped_text_file)
+
 
 # Create a toolbar
 toolbar = tk.Frame(root)
