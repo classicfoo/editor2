@@ -5,7 +5,6 @@ import os
 import sys
 from tkinterdnd2 import DND_FILES, TkinterDnD
 
-
 current_file_path = None  # Initialize current_file_path as None
 
 def open_dropped_text_file(event):
@@ -182,8 +181,20 @@ center_window(root)
 
 # Create a text widget with a fixed size
 text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1)
+
+# Create vertical scrollbar
+vertical_scrollbar = tk.Scrollbar(root, command=text.yview)
+vertical_scrollbar.pack(side="right", fill="y")
+text.config(yscrollcommand=vertical_scrollbar.set)
+
+# Create horizontal scrollbar
+#horizontal_scrollbar = tk.Scrollbar(root, orient="horizontal", command=text.xview)
+#horizontal_scrollbar.pack(side="bottom", fill="x")
+#text.config(xscrollcommand=horizontal_scrollbar.set)
+
 text.pack()
 text.focus()
+
 
 # Create a menu bar
 menu = tk.Menu(root)
