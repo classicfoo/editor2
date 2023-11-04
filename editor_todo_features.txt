@@ -7,8 +7,6 @@
 - Ctrl+backspace to delete entire word
 - Insert tab at beginning of selected lines
 - Change name to Text Tools
-- Make it so that users can insert any bullets for a selection
-- Replace edit menu with command palette
 
 # Notes
 - Text widget has some default bindings that interfere
@@ -19,11 +17,9 @@ X press backspace to delete word
 X Save as when starting a new file
 X "New" file menu
 X file name suggestion - when saving a file
-	X check the first line, if it starts with #
-	X then use that line as the filename in filedialog when saving a file
-	X convert the filename to lowercase
-	X convert spaces to underscores
+X Make it so that users can insert any bullets for a selection
 T prompt before closing (like search.pyw)
 T format markdown document
 	T for any headings, capitalize every first letter of every word
 	T apply sentence case for paragraphs
+T Replace edit menu with command palette
