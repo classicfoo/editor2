@@ -10,15 +10,20 @@ current_file_path = None  # Initialize current_file_path as None
 def sentence_case():
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     if selected_text:
-        sentences = re.split(r'(?<=[.!?])\s+', selected_text)
-        sentence_cased_sentences = []
-        for sentence in sentences:
-            sentence = sentence.strip()
-            if sentence:
-                sentence = sentence[0].capitalize() + sentence[1:]
-            sentence_cased_sentences.append(sentence)
-        sentence_cased_text = ' '.join(sentence_cased_sentences)
+        lines = selected_text.splitlines()
+        sentence_cased_text = []
+        for line in lines:
+            sentences = re.split(r'(?<=[.!?])\s+', line)
+            sentence_cased_sentences = []
+            for sentence in sentences:
+                if sentence:
+                    sentence = sentence[0].capitalize() + sentence[1:]
+                sentence_cased_sentences.append(sentence)
+            sentence_cased_line = ' '.join(sentence_cased_sentences)
+            sentence_cased_text.append(sentence_cased_line)
+        sentence_cased_text = '\n'.join(sentence_cased_text)
         text.replace(tk.SEL_FIRST, tk.SEL_LAST, sentence_cased_text)
+
 
 def sentence_case_with_bullets():
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
