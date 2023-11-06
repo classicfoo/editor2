@@ -23,3 +23,7 @@ T format markdown document
 	T for any headings, capitalize every first letter of every word
 	T apply sentence case for paragraphs
 T Replace edit menu with command palette
+
+# Bugs
+T Sentence case with bullets does not work for lines with tabs in front. 
+
