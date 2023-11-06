@@ -26,4 +26,5 @@ T Replace edit menu with command palette
 
 # Bugs
 T Sentence case with bullets does not work for lines with tabs in front. 
+T sentence case removes newlines at the end
 
