@@ -25,6 +25,7 @@ T format markdown document
 T Replace edit menu with command palette
 
 # Bugs
-T Sentence case with bullets does not work for lines with tabs in front. 
-T sentence case removes newlines at the end
+T Sentence case with bullets - does not work for lines with tabs in front. 
+T sentence case - removes newlines at the end
+T Sentence case - If there there is a sentence with a dash like this "this - that" it should be captialised like this "This - That". 
 
