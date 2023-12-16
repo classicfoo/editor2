@@ -1,10 +1,79 @@
+#bump 
+ 
 import tkinter as tk
 from tkinter import filedialog
 import re
 import os
 import sys
+from tkinterdnd2 import DND_FILES, TkinterDnD
 
 current_file_path = None  # Initialize current_file_path as None
+
+def sentence_case():
+    selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+    if selected_text:
+        lines = selected_text.splitlines()
+        sentence_cased_text = []
+        for line in lines:
+            sentences = re.split(r'(?<=[.!?])\s+', line)
+            sentence_cased_sentences = []
+            for sentence in sentences:
+                if sentence:
+                    sentence = sentence[0].capitalize() + sentence[1:]
+                sentence_cased_sentences.append(sentence)
+            sentence_cased_line = ' '.join(sentence_cased_sentences)
+            sentence_cased_text.append(sentence_cased_line)
+        sentence_cased_text = '\n'.join(sentence_cased_text)
+        text.replace(tk.SEL_FIRST, tk.SEL_LAST, sentence_cased_text)
+
+
+def sentence_case_with_bullets():
+    selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+    if selected_text:
+        lines = selected_text.splitlines()
+        capitalized_lines = []
+        for line in lines:
+            if len(line) >= 3:
+                # Capitalize the third character in the line
+                line = line[:2] + line[2].capitalize() + line[3:]
+            capitalized_lines.append(line)
+        capitalized_text = '\n'.join(capitalized_lines)
+
+        # copied from sentence_case():
+        sentence_cased_text = []
+        for line in capitalized_lines:
+            sentences = re.split(r'(?<=[.!?])\s+', line)
+            sentence_cased_sentences = []
+            for sentence in sentences:
+                if sentence:
+                    sentence = sentence[0].capitalize() + sentence[1:]
+                sentence_cased_sentences.append(sentence)
+            sentence_cased_line = ' '.join(sentence_cased_sentences)
+            sentence_cased_text.append(sentence_cased_line)
+        sentence_cased_text = '\n'.join(sentence_cased_text)
+        text.replace(tk.SEL_FIRST, tk.SEL_LAST, sentence_cased_text)
+
+
+
+def open_dropped_text_file(event):
+    global current_file_path
+    file_path = event.data
+    if file_path:
+        with open(file_path, 'r') as file:
+            text.delete(1.0, tk.END)  # Clear the current content
+            text.insert(tk.END, file.read())  # Insert file content into the Text widget
+        current_file_path = file_path
+        file_name = os.path.basename(file_path)
+        root.title(f"{file_name} - Editor")
+
+
+def change_cursor(event):
+    event.widget.config(cursor="copy")
+
+def reset_cursor(event):
+    event.widget.config(cursor="")
+
+
 
 def new_file(event=None):
     global current_file_path
@@ -144,7 +213,7 @@ def capitalize_first_letter_of_each_line(selected_text):
 
 
 # Create the main window
-root = tk.Tk()
+root = TkinterDnD.Tk()
 root.title("Editor")
 
 #def minimize_window():
@@ -160,8 +229,20 @@ center_window(root)
 
 # Create a text widget with a fixed size
 text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1)
+
+# Create vertical scrollbar
+vertical_scrollbar = tk.Scrollbar(root, command=text.yview)
+vertical_scrollbar.pack(side="right", fill="y")
+text.config(yscrollcommand=vertical_scrollbar.set)
+
+# Create horizontal scrollbar
+#horizontal_scrollbar = tk.Scrollbar(root, orient="horizontal", command=text.xview)
+#horizontal_scrollbar.pack(side="bottom", fill="x")
+#text.config(xscrollcommand=horizontal_scrollbar.set)
+
 text.pack()
 text.focus()
+
 
 # Create a menu bar
 menu = tk.Menu(root)
@@ -180,6 +261,8 @@ file_menu.add_command(label="Exit", command=root.quit)
 edit_menu = tk.Menu(menu, tearoff=False)
 menu.add_cascade(label="Edit", menu=edit_menu)
 edit_menu.add_command(label="Capitalize Every Word", command=capitalize_selected_text)
+edit_menu.add_command(label="Sentence Case", command=sentence_case)
+edit_menu.add_command(label="Sentence Case (With Bullets)", command=sentence_case_with_bullets)
 edit_menu.add_command(label="Insert Bullets", command=add_bullets)
 edit_menu.add_command(label="Insert Tabs", command=add_tabs)
 # edit_menu.add_separator()
@@ -192,6 +275,13 @@ text.bind("<Control-s>", save_file)
 text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
 
+
+
+# Register the Text widget as a drop target for text files
+text.drop_target_register(DND_FILES)
+text.dnd_bind('<<Drop>>', open_dropped_text_file)
+
+
 # Create a toolbar
 toolbar = tk.Frame(root)
 toolbar.pack(fill="x")
@@ -199,6 +289,24 @@ toolbar.pack(fill="x")
 # Add a button to capitalize selected text
 capitalize_button = tk.Button(toolbar, text="Capitalize", command=capitalize_selected_text)
 capitalize_button.pack(side="left")
+
+# open any files that were passed to it as arguments
+if len(sys.argv) > 1:
+    file_path = sys.argv[1]
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        # Assuming you have a function like open_file(file_path)
+        #open_file(file_path)
+
+        if file_path:
+            with open(file_path, 'r') as file:
+                text.delete(1.0, tk.END)
+                text.insert(tk.END, file.read())
+            # Get the file name from the file path
+            file_name = os.path.basename(file_path)
+            root.title(f"{file_name} - Editor")
+            current_file_path = file_path
+
+        current_file_path = file_path  # Update the current file path
 
 # Run the main loop
 root.mainloop()
