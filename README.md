@@ -1,5 +1,11 @@
 # editor2
 
+# Features
+
+- opens files when argument given
+- drag and drop files to open
+
+
 ## todo
 - customizable bullets when inserting into multiple lines
 
