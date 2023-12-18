@@ -7,6 +7,7 @@
 
 
 ## todo
+- save as in file menu
 - customizable bullets when inserting into multiple lines
 - follow indent pattern when pressing enter
 - toggle read only 
