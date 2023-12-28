@@ -10,6 +10,8 @@
 - Edit > Captialize Every Word In Selection
 - Edit > Insert tabs (at beginning of selected lines)
 - Edit > Set read only and normal attributes
+- Edit > Prepend lines with input
+- Edit > Find and replace in selection
 - Ctrl + backspace to delete entire word 
 - Opens files when argument given
 - Drag and drop files to open
