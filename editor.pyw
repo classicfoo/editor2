@@ -1,4 +1,3 @@
-#bump 
  
 import tkinter as tk
 from tkinter import filedialog
@@ -6,8 +5,53 @@ import re
 import os
 import sys
 from tkinterdnd2 import DND_FILES, TkinterDnD
+import ctypes
+from tkinter import messagebox
+
 
 current_file_path = None  # Initialize current_file_path as None
+
+def is_read_only():
+    file_path = current_file_path
+
+    # Call the GetFileAttributesW function
+    file_attributes = ctypes.windll.kernel32.GetFileAttributesW(file_path)
+
+    # Check if the file is read-only
+    if file_attributes != -1:  # -1 indicates an error
+        is_read_only = file_attributes & 1  # Check the lowest bit (read-only bit)
+        if is_read_only:
+            # print(f"The file '{file_path}' is read-only.")
+            return True
+        else:
+            # print(f"The file '{file_path}' is normal.")
+            return False
+    else:
+        print(f"Failed to retrieve attributes for '{file_path}'.")
+
+def set_attribute_readonly():
+    file_path = current_file_path
+
+    # Use the SetFileAttributesW function to set the read-only attribute
+    ctypes.windll.kernel32.SetFileAttributesW(file_path, 1)  # 1 corresponds to FILE_ATTRIBUTE_READONLY
+
+    # Add read only tag to title
+    new_text = " - [READ-ONLY]"
+    current_title = root.title()
+    updated_title = current_title + new_text
+    root.title(updated_title)
+
+def set_attribute_normal():
+
+    file_path = current_file_path
+
+    # Set the file attribute to make it writable again
+    ctypes.windll.kernel32.SetFileAttributesW(file_path, 0)  # 0 corresponds to normal attributes
+
+    # Remove read only tag to title
+    current_title = root.title()
+    new_title = current_title.replace(" - [READ-ONLY]", "")
+    root.title(new_title)
 
 def sentence_case():
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
@@ -66,6 +110,11 @@ def open_dropped_text_file(event):
         file_name = os.path.basename(file_path)
         root.title(f"{file_name} - Editor")
 
+        if is_read_only:
+            set_attribute_readonly()
+        else:
+            set_attribute_normal()
+
 
 def change_cursor(event):
     event.widget.config(cursor="copy")
@@ -120,11 +169,20 @@ def open_file(event=None):
         root.title(f"{file_name} - Editor")
         current_file_path = file_path
 
+        if is_read_only:
+            set_attribute_readonly()
+        else:
+            set_attribute_normal()
+
 def save_file(event=None):
     global current_file_path
+
     if current_file_path:
-        with open(current_file_path, 'w') as file:
-            file.write(text.get(1.0, tk.END))
+        if is_read_only():
+            messagebox.showerror("Read-only Error","Cannot save Read-only file.")
+        else:
+            with open(current_file_path, 'w') as file:
+                file.write(text.get(1.0, tk.END))
     else:
         # Check if the first line of the text starts with '#'
         first_line = text.get(1.0, 1.0 + len("#") + 1)  # Get the first line
@@ -265,6 +323,8 @@ edit_menu.add_command(label="Sentence Case", command=sentence_case)
 edit_menu.add_command(label="Sentence Case (With Bullets)", command=sentence_case_with_bullets)
 edit_menu.add_command(label="Insert Bullets", command=add_bullets)
 edit_menu.add_command(label="Insert Tabs", command=add_tabs)
+edit_menu.add_command(label="Set Attribute Read-Only ", command=set_attribute_readonly)
+edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_normal)
 # edit_menu.add_separator()
 # edit_menu.add_command(label="Find and Replace", command=lambda: find_replace.open_find_replace(root, text))
 
@@ -305,6 +365,11 @@ if len(sys.argv) > 1:
             file_name = os.path.basename(file_path)
             root.title(f"{file_name} - Editor")
             current_file_path = file_path
+
+            if is_read_only:
+                set_attribute_readonly()
+            else:
+                set_attribute_normal()
 
         current_file_path = file_path  # Update the current file path
 
