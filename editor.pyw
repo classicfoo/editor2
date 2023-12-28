@@ -1,6 +1,6 @@
  
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, simpledialog
 import re
 import os
 import sys
@@ -10,6 +10,44 @@ from tkinter import messagebox
 
 
 current_file_path = None  # Initialize current_file_path as None
+
+def find_replace_in_selection():
+    # Get the current selection range
+    sel_start = text.index(tk.SEL_FIRST)
+    sel_end = text.index(tk.SEL_LAST)
+
+    # Get the selected text
+    selected_text = text.get(sel_start, sel_end)
+
+    # Show a dialog to get the find and replace strings
+    find_str = simpledialog.askstring("Find and Replace", "Find:")
+    replace_str = simpledialog.askstring("Find and Replace", "Replace with:")
+    
+    # Create a regular expression with the re.IGNORECASE flag
+    pattern = re.compile(re.escape(find_str), re.IGNORECASE)
+
+    # Perform find and replace in the selected text
+    modified_text = pattern.sub(replace_str, selected_text)
+
+    # Replace the selected text with the modified text
+    text.replace(sel_start, sel_end, modified_text)
+
+
+def prepend_lines_with_input():
+    # Create a simple input dialog
+    user_input = tk.simpledialog.askstring("Input", "Enter text to prepend to selected lines:")
+    if user_input is not None:  # Check if the user entered something
+        # Get the selected text
+        selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+        if selected_text:
+            # Split the selected text into lines
+            lines = selected_text.split('\n')
+            # Prepend the user input to each line
+            modified_lines = [user_input + line if line.strip() != '' else line for line in lines]
+            # Join the modified lines back together
+            modified_text = '\n'.join(modified_lines)
+            # Replace the selected text with the modified text
+            text.replace(tk.SEL_FIRST, tk.SEL_LAST, modified_text)
 
 def is_read_only():
     file_path = current_file_path
@@ -325,6 +363,9 @@ edit_menu.add_command(label="Insert Bullets", command=add_bullets)
 edit_menu.add_command(label="Insert Tabs", command=add_tabs)
 edit_menu.add_command(label="Set Attribute Read-Only ", command=set_attribute_readonly)
 edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_normal)
+edit_menu.add_command(label="Prepend Lines with Input", command=prepend_lines_with_input)
+edit_menu.add_command(label="Find and Replace in Selection", command=find_replace_in_selection)
+
 # edit_menu.add_separator()
 # edit_menu.add_command(label="Find and Replace", command=lambda: find_replace.open_find_replace(root, text))
 
