@@ -55,6 +55,8 @@ def is_read_only():
     # Call the GetFileAttributesW function
     file_attributes = ctypes.windll.kernel32.GetFileAttributesW(file_path)
 
+    x = 0
+
     # Check if the file is read-only
     if file_attributes != -1:  # -1 indicates an error
         is_read_only = file_attributes & 1  # Check the lowest bit (read-only bit)
@@ -148,7 +150,7 @@ def open_dropped_text_file(event):
         file_name = os.path.basename(file_path)
         root.title(f"{file_name} - Editor")
 
-        if is_read_only:
+        if is_read_only():
             set_attribute_readonly()
         else:
             set_attribute_normal()
@@ -207,7 +209,7 @@ def open_file(event=None):
         root.title(f"{file_name} - Editor")
         current_file_path = file_path
 
-        if is_read_only:
+        if is_read_only():
             set_attribute_readonly()
         else:
             set_attribute_normal()
@@ -407,7 +409,7 @@ if len(sys.argv) > 1:
             root.title(f"{file_name} - Editor")
             current_file_path = file_path
 
-            if is_read_only:
+            if is_read_only():
                 set_attribute_readonly()
             else:
                 set_attribute_normal()
