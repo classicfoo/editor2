@@ -2,15 +2,15 @@
 
 # Features
 
-- opens files when argument given
-- drag and drop files to open
-- read only status in title bar
-- set read only and normal attributes
+- Opens files when argument given
+- Drag and drop files to open
+- Read only status in title bar
+- Set read only and normal attributes
 
 ## Todo
-- save as in file menu
-- customizable bullets when inserting into multiple lines
-- follow indent pattern when pressing enter
+- Save as in file menu
+- Customizable bullets when inserting into multiple lines
+- Follow indent pattern when pressing enter
 
 
 
