@@ -7,7 +7,7 @@
 - read only status in title bar
 - set read only and normal attributes
 
-## todo
+## Todo
 - save as in file menu
 - customizable bullets when inserting into multiple lines
 - follow indent pattern when pressing enter
