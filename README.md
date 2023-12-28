@@ -1,11 +1,17 @@
 # editor2
 
 # Features
-
+- Font: Consolas Regular 11
+- Open Hotkey (Ctrl + O)
+- Save Hotkey (Ctrl + S)
+- File name in title bar
+- Read only status in title bar
+- Edit > Captialize Every Word In Selection
+- Edit > Insert tabs (at beginning of selected lines)
+- Edit > Set read only and normal attributes
+- Ctrl + backspace to delete entire word 
 - Opens files when argument given
 - Drag and drop files to open
-- Read only status in title bar
-- Set read only and normal attributes
 
 # Todo
 - Save as in file menu
