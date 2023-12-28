@@ -6,7 +6,7 @@
 - drag and drop files to open
 - read only status in title bar
 - set read only and normal attributes
-- 
+
 ## todo
 - save as in file menu
 - customizable bullets when inserting into multiple lines
