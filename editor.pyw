@@ -110,14 +110,18 @@ class FindReplaceDialog(tk.Toplevel):
         self.destroy()
 
 def highlight_selected_text(event=None):
-    text.tag_configure("highlight", background="yellow")
+    text.tag_configure("highlight", background="#0078D7",foreground="#FFFFFF")
     if text.tag_ranges("sel"):
         selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
         text.tag_add("highlight", tk.SEL_FIRST, tk.SEL_LAST)
 
 def unhighlight_selected_text(event=None):
-    text.tag_remove("highlight", "1.0", tk.END)
-
+    if text.tag_ranges("sel"):
+        selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+        last = tk.SEL_LAST
+        text.tag_remove("highlight", tk.SEL_FIRST, tk.SEL_LAST)
+        text.focus()
+        text.mark_set("insert", last)
 
 def find_replace_in_selection():
     # Get the current selection range
