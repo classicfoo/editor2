@@ -8,8 +8,116 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 import ctypes
 from tkinter import messagebox
 
+class AutocompleteCombobox(tk.Frame):
+    def __init__(self, parent, values_commands):
+        super().__init__(parent)
+        self.values_commands = values_commands  # Store values and commands
+        self.values = list(values_commands.keys())  # Extract just the values for display
+
+        self.entry_var = tk.StringVar()
+        self.entry = tk.Entry(self, textvariable=self.entry_var)
+        self.entry.grid(row=0, column=0)
+        self.entry.bind("<KeyRelease>", self.on_keyrelease)
+        self.entry.bind("<FocusIn>", highlight_selected_text)  # Bind FocusIn event to show listbox
+        self.entry.bind("<FocusOut>", self.hide_listbox)  # Bind FocusIn event to hide listbox
+
+        self.listbox = tk.Listbox(self)
+        self.listbox.grid(row=1, column=0)
+        self.listbox.grid_forget()  # Initially hide the listbox
+
+        # Bind the listbox select event
+        self.listbox.bind("<<ListboxSelect>>", self.on_listbox_select)
+
+        self.update_listbox()
+        self.listbox.bind("<FocusOut>", self.hide_listbox)
+
+    def on_keyrelease(self, event):
+        self.update_listbox()
+        self.adjust_listbox_height()  # Adjust the listbox height based on the number of items
+        self.listbox.grid()  # Show the listbox
+
+    def update_listbox(self):
+        search_term = self.entry_var.get().lower()
+        self.listbox.delete(0, tk.END)
+        for item in self.values:
+            if search_term in item.lower():
+                self.listbox.insert(tk.END, item)
+
+    def hide_listbox(self, event=None):
+        # Hide the listbox when it loses focus
+        self.listbox.grid_forget()
+        self.entry.delete(0, tk.END)
+        unhighlight_selected_text()
+
+    def show_listbox(self, event):
+        # Show the listbox when the entry is clicked again
+        self.update_listbox()
+        self.adjust_listbox_height()
+        self.listbox.grid()
+        highlight_selected_text()
+
+    def on_listbox_select(self, event):
+        # Get the current selection from the listbox
+        selection = self.listbox.curselection()
+        if selection:
+            index = selection[0]
+            data = self.listbox.get(index)
+            self.entry_var.set(data)  # Set the entry field to the selected value
+            self.hide_listbox()  # Hide the listbox
+            command = self.values_commands.get(data)  # Get the command associated with the selected value
+            if command:
+                command()  # Execute the command
+
+    def adjust_listbox_height(self):
+        # Adjust the height of the listbox based on the number of items, up to a maximum
+        max_height = 10  # Maximum height of the listbox
+        items = self.listbox.size()
+        self.listbox.config(height=min(items, max_height))
+
 
 current_file_path = None  # Initialize current_file_path as None
+
+class FindReplaceDialog(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.title("Find and Replace")
+
+        self.find_label = tk.Label(self, text="Find:")
+        self.find_label.pack()
+
+        self.find_entry = tk.Entry(self)
+        self.find_entry.pack()
+
+        self.replace_label = tk.Label(self, text="Replace with:")
+        self.replace_label.pack()
+
+        self.replace_entry = tk.Entry(self)
+        self.replace_entry.pack()
+
+        self.ok_button = tk.Button(self, text="OK", command=self.on_ok)
+        self.ok_button.pack()
+
+        self.find_value = None
+        self.replace_value = None
+
+        # Bind the Enter key to the OK button
+        self.bind("<Return>", self.on_ok)
+        self.find_entry.bind("<FocusIn>", highlight_selected_text)
+
+    def on_ok(self,event=None):
+        self.find_value = self.find_entry.get()
+        self.replace_value = self.replace_entry.get()
+        self.destroy()
+
+def highlight_selected_text(event=None):
+    text.tag_configure("highlight", background="yellow")
+    if text.tag_ranges("sel"):
+        selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
+        text.tag_add("highlight", tk.SEL_FIRST, tk.SEL_LAST)
+
+def unhighlight_selected_text(event=None):
+    text.tag_remove("highlight", "1.0", tk.END)
+
 
 def find_replace_in_selection():
     # Get the current selection range
@@ -19,9 +127,26 @@ def find_replace_in_selection():
     # Get the selected text
     selected_text = text.get(sel_start, sel_end)
 
-    # Show a dialog to get the find and replace strings
-    find_str = simpledialog.askstring("Find and Replace", "Find:")
-    replace_str = simpledialog.askstring("Find and Replace", "Replace with:")
+    highlight_selected_text()
+
+    # Open Find Replace Dialog
+    dialog = FindReplaceDialog(root)
+    root.update_idletasks()  # Ensure that geometry is updated
+    root_x = root.winfo_rootx()
+    root_y = root.winfo_rooty()
+    root_width = root.winfo_width()
+    root_height = root.winfo_height()
+    dialog_width = dialog.winfo_reqwidth()
+    dialog_height = dialog.winfo_reqheight()
+    x = root_x + (root_width - dialog_width) // 2
+    y = root_y + (root_height - dialog_height) // 2
+    dialog.geometry(f"+{x}+{y}")
+    root.wait_window(dialog)
+    highlight_selected_text()
+
+
+    find_str = dialog.find_value
+    replace_str = dialog.replace_value
     
     # Create a regular expression with the re.IGNORECASE flag
     pattern = re.compile(re.escape(find_str), re.IGNORECASE)
@@ -31,6 +156,9 @@ def find_replace_in_selection():
 
     # Replace the selected text with the modified text
     text.replace(sel_start, sel_end, modified_text)
+
+    unhighlight_selected_text()
+
 
 
 def prepend_lines_with_input():
@@ -309,6 +437,34 @@ def capitalize_first_letter_of_each_line(selected_text):
         capitalized_text = '\n'.join(capitalized_lines)
         return capitalized_text
 
+def create_toolbar(root):
+    # Create a toolbar frame with a raised border
+    toolbar_frame = tk.Frame(root, relief=tk.RAISED, borderwidth=1)
+    toolbar_frame.grid(row=1, column=0, sticky="ew")
+
+    # Dictionary of Edit menu items and their commands
+    menu_commands = {
+        "New File": new_file,
+        "Open File": open_file,
+        "Save File": save_file,
+        "Capitalize Every Word": capitalize_selected_text,
+        "Sentence Case": sentence_case,
+        "Sentence Case (With Bullets)": sentence_case_with_bullets,
+        "Insert Bullets": add_bullets,
+        "Insert Tabs": add_tabs,
+        "Set Attribute Read-Only": set_attribute_readonly,
+        "Set Attribute Normal": set_attribute_normal,
+        "Prepend Lines with Input": prepend_lines_with_input,
+        "Find and Replace in Selection": find_replace_in_selection,
+        # Add other edit menu items and their corresponding functions here
+    }
+
+    # Create an AutocompleteCombobox widget in the toolbar
+    # Pass the edit_menu_commands dictionary to the AutocompleteCombobox
+    autocomplete_combobox = AutocompleteCombobox(toolbar_frame, menu_commands)
+    autocomplete_combobox.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+
+
 
 # Create the main window
 root = TkinterDnD.Tk()
@@ -326,11 +482,20 @@ root.resizable(True, True)
 center_window(root)
 
 # Create a text widget with a fixed size
-text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1)
+text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1, exportselection=False)
+
 
 # Create vertical scrollbar
 vertical_scrollbar = tk.Scrollbar(root, command=text.yview)
-vertical_scrollbar.pack(side="right", fill="y")
+vertical_scrollbar.grid(row=2, column=1, sticky="ns")
+
+# Configure the grid row and column weights
+root.grid_rowconfigure(2, weight=1)
+root.grid_columnconfigure(0, weight=1)
+
+text.config(yscrollcommand=vertical_scrollbar.set)
+
+# Connect the scrollbar to the text widget
 text.config(yscrollcommand=vertical_scrollbar.set)
 
 # Create horizontal scrollbar
@@ -338,9 +503,9 @@ text.config(yscrollcommand=vertical_scrollbar.set)
 #horizontal_scrollbar.pack(side="bottom", fill="x")
 #text.config(xscrollcommand=horizontal_scrollbar.set)
 
-text.pack()
-text.focus()
 
+text.grid(row=2, column=0, padx=0, pady=0, sticky="nsew")
+text.focus()
 
 # Create a menu bar
 menu = tk.Menu(root)
@@ -368,8 +533,13 @@ edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_norma
 edit_menu.add_command(label="Prepend Lines with Input", command=prepend_lines_with_input)
 edit_menu.add_command(label="Find and Replace in Selection", command=find_replace_in_selection)
 
-# edit_menu.add_separator()
-# edit_menu.add_command(label="Find and Replace", command=lambda: find_replace.open_find_replace(root, text))
+
+ # Create a frame to hold the "File" menu and the custom widget
+menu_frame = tk.Frame(menu)
+menu_frame.grid(row=0, column=0, sticky="ew")
+
+# Create the toolbar with AutocompleteCombobox
+create_toolbar(root)
 
 
 # Bind hotkeys
@@ -379,19 +549,9 @@ text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
 
 
-
 # Register the Text widget as a drop target for text files
 text.drop_target_register(DND_FILES)
 text.dnd_bind('<<Drop>>', open_dropped_text_file)
-
-
-# Create a toolbar
-toolbar = tk.Frame(root)
-toolbar.pack(fill="x")
-
-# Add a button to capitalize selected text
-capitalize_button = tk.Button(toolbar, text="Capitalize", command=capitalize_selected_text)
-capitalize_button.pack(side="left")
 
 # open any files that were passed to it as arguments
 if len(sys.argv) > 1:
