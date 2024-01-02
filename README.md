@@ -20,7 +20,7 @@
 # Todo
 - On window focus check for read only status and update (there may be 2 instances of the same file open)
 - Rename "prepend lines with input" to "insert custom bullet"
-- Make width of text entry and listbox wider
+- Make width of listbox wider
 - Save as in file menu
 - Follow indent pattern when pressing enter
 - Give option to Save As after notifying of error when trying to save a read only file
