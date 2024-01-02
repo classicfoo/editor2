@@ -17,6 +17,7 @@
 - Drag and drop files to open
 
 # Todo
+- On window focus check for read only status and update
 - Save as in file menu
 - Customizable bullets when inserting into multiple lines
 - Follow indent pattern when pressing enter
