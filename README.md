@@ -17,7 +17,7 @@
 - Drag and drop files to open
 
 # Todo
-- On window focus check for read only status and update
+- On window focus check for read only status and update (there may be 2 instances of the same file open)
 - Save as in file menu
 - Customizable bullets when inserting into multiple lines
 - Follow indent pattern when pressing enter
