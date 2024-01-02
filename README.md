@@ -19,10 +19,8 @@
 - Give option to Save As after notifying of error when trying to save a read only file
 
 # Todo
-- On window focus check for read only status and update (there may be 2 instances of the same file open)
 - Save as in file menu
 - Follow indent pattern when pressing enter
-- Rename "prepend lines with input" to "insert custom bullet"
-- Make width of text entry and listbox wider
+
 
 ![2023-10-31 18_40_37-Settings](https://github.com/classicfoo/editor2/assets/20607431/b1db5147-e65b-4054-aacd-0143aab6e355)
