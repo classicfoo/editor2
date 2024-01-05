@@ -17,17 +17,15 @@
 - Drag and drop files to open
 - Customizable bullets when inserting into multiple lines
 - Text entry press tab/down key to select first item in listbox and press enter/click to select
+- Toggle Read-only
+- Save as in file menu
 
 
 # Todo
 - Find and replace remembers last values
-- Toggle Read-only
-- On window focus check for read only status and update (there may be 2 instances of the same file open)
 - Rename "prepend lines with input" to "insert custom bullet"
 - Make width of listbox wider
-- Save as in file menu
 - Follow indent pattern when pressing enter
-- Give option to Save As after notifying of error when trying to save a read only file
 
 ![image](https://github.com/classicfoo/editor2/assets/20607431/de546571-abf6-465a-a934-94d9350c1837)
 
