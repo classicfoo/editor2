@@ -197,6 +197,9 @@ def find_replace_in_selection(event=None):
 
 
 def prepend_lines_with_input():
+    
+    check_selection()
+
     # Create a simple input dialog
     user_input = tk.simpledialog.askstring("Input", "Enter text to prepend to selected lines:")
     if user_input is not None:  # Check if the user entered something
@@ -263,6 +266,9 @@ def toggle_readonly():
         set_attribute_readonly()
 
 def sentence_case():
+    
+    check_selection()
+
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     if selected_text:
         lines = selected_text.splitlines()
@@ -281,6 +287,9 @@ def sentence_case():
 
 
 def sentence_case_with_bullets():
+    
+    check_selection()
+
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     if selected_text:
         lines = selected_text.splitlines()
@@ -451,6 +460,9 @@ def capitalize_selected_text():
         text.replace(tk.SEL_FIRST, tk.SEL_LAST, capitalized_text)
 
 def add_bullets():
+    
+    check_selection()
+
     # Get the selected text
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     selected_text = capitalize_first_letter_of_each_line(selected_text)
@@ -462,6 +474,9 @@ def add_bullets():
     text.replace(tk.SEL_FIRST, tk.SEL_LAST, formatted_text)
 
 def add_tabs():
+    
+    check_selection()
+
     # Get the selected text
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     
