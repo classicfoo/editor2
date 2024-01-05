@@ -96,6 +96,8 @@ class AutocompleteCombobox(tk.Frame):
             self.entry_var.set(selected_value)
             self.execute_command(event)  # Call the on_listbox_select method
 
+    def focus_entry(self,event=None):
+        self.entry.focus()
 
 current_file_path = None  # Initialize current_file_path as None
 
@@ -625,7 +627,7 @@ text.bind("<FocusIn>", auto_complete_combobox.hide_listbox)
 
 text.bind("<Control-h>", find_replace_in_selection)
 text.bind("<Control-f>", find_replace_in_selection)
-
+text.bind("<Control-p>", auto_complete_combobox.focus_entry)
 
 # Register the Text widget as a drop target for text files
 text.drop_target_register(DND_FILES)
