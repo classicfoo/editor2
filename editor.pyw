@@ -198,7 +198,7 @@ def find_replace_in_selection(event=None):
 
 
 
-def prepend_lines_with_input():
+def insert_custom_bullet():
     
     check_selection()
 
@@ -512,12 +512,12 @@ def create_toolbar(root):
         "Capitalize Every Word": capitalize_selected_text,
         "Sentence Case": sentence_case,
         "Sentence Case (With Bullets)": sentence_case_with_bullets,
+        "Insert Custom Bullet": insert_custom_bullet,
         "Insert Bullets": add_bullets,
         "Insert Tabs": add_tabs,
         "Toggle Read-Only": toggle_readonly,
         "Set Attribute Read-Only": set_attribute_readonly,
         "Set Attribute Normal": set_attribute_normal,
-        "Prepend Lines with Input": prepend_lines_with_input,
         "Find and Replace in Selection": find_replace_in_selection,
         # Add other edit menu items and their corresponding functions here
     }
@@ -604,7 +604,7 @@ edit_menu.add_command(label="Insert Bullets", command=add_bullets)
 edit_menu.add_command(label="Insert Tabs", command=add_tabs)
 edit_menu.add_command(label="Set Attribute Read-Only ", command=set_attribute_readonly)
 edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_normal)
-edit_menu.add_command(label="Prepend Lines with Input", command=prepend_lines_with_input)
+edit_menu.add_command(label="Insert Custom Bullet", command=insert_custom_bullet)
 edit_menu.add_command(label="Find and Replace in Selection", command=find_replace_in_selection)
 
 find_str = ""
