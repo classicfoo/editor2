@@ -21,9 +21,9 @@
 - Toggle Read-only
 - Save as in file menu
 - Find and replace remembers last values
+- Rename "prepend lines with input" to "insert custom bullet"
 
 # Todo
-- Rename "prepend lines with input" to "insert custom bullet"
 - Make width of listbox wider
 - Follow indent pattern when pressing enter
 
