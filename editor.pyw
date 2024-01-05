@@ -476,9 +476,10 @@ def create_toolbar(root):
 
     # Dictionary of Edit menu items and their commands
     menu_commands = {
-        "New File": new_file,
-        "Open File": open_file,
-        "Save File": save_file,
+        "New": new_file,
+        "Open": open_file,
+        "Save": save_file,
+        "Save As": save_as_file,
         "Capitalize Every Word": capitalize_selected_text,
         "Sentence Case": sentence_case,
         "Sentence Case (With Bullets)": sentence_case_with_bullets,
@@ -551,6 +552,7 @@ menu.add_cascade(label="File", menu=file_menu)
 file_menu.add_command(label="New", command=new_file, accelerator="Ctrl+N")  # Add a "New" menu item
 file_menu.add_command(label="Open", command=open_file, accelerator="Ctrl+O")
 file_menu.add_command(label="Save", command=save_file, accelerator="Ctrl+S")
+file_menu.add_command(label="Save As", command=save_as_file, accelerator="Ctrl+Shift+S")
 file_menu.add_separator()
 file_menu.add_command(label="Exit", command=root.quit)
 
