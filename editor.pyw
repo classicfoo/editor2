@@ -103,18 +103,21 @@ class FindReplaceDialog(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
         self.title("Find and Replace")
+        global find_str, replace_str
 
         self.find_label = tk.Label(self, text="Find:")
         self.find_label.pack()
 
         self.find_entry = tk.Entry(self)
         self.find_entry.pack()
+        self.find_entry.insert(0, find_str)
 
         self.replace_label = tk.Label(self, text="Replace with:")
         self.replace_label.pack()
 
         self.replace_entry = tk.Entry(self)
         self.replace_entry.pack()
+        self.replace_entry.insert(0, replace_str)
 
         self.ok_button = tk.Button(self, text="OK", command=self.on_ok)
         self.ok_button.pack()
@@ -125,6 +128,9 @@ class FindReplaceDialog(tk.Toplevel):
         # Bind the Enter key to the OK button
         self.bind("<Return>", self.on_ok)
         self.find_entry.bind("<FocusIn>", highlight_selected_text)
+
+        self.focus()
+        self.find_entry.focus()
 
     def on_ok(self,event=None):
         self.find_value = self.find_entry.get()
@@ -145,7 +151,10 @@ def unhighlight_selected_text(event=None):
         text.focus()
         text.mark_set("insert", last)
 
-def find_replace_in_selection():
+def find_replace_in_selection(event=None):
+    
+    check_selection()
+
     # Get the current selection range
     sel_start = text.index(tk.SEL_FIRST)
     sel_end = text.index(tk.SEL_LAST)
@@ -170,7 +179,7 @@ def find_replace_in_selection():
     root.wait_window(dialog)
     highlight_selected_text()
 
-
+    global find_str, replace_str
     find_str = dialog.find_value
     replace_str = dialog.replace_value
     
@@ -423,6 +432,9 @@ def save_as_file():
 
 
 def capitalize_selected_text():
+
+    check_selection()
+
     # Get the selected text
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     if selected_text:
@@ -499,7 +511,16 @@ def create_toolbar(root):
     autocomplete_combobox.grid(row=0, column=0, padx=5, pady=5, sticky="w")
     return autocomplete_combobox
 
-
+def check_selection():
+    try:
+        selected_range = text.tag_ranges("sel")
+        if selected_range:
+            start_index, end_index = selected_range
+            selected_text = text.get(start_index, end_index)
+        else:
+            messagebox.showwarning("No Selection", "Please select some text before continuing")
+    except tk.TclError as e:
+        messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
 # Create the main window
 root = TkinterDnD.Tk()
@@ -569,6 +590,8 @@ edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_norma
 edit_menu.add_command(label="Prepend Lines with Input", command=prepend_lines_with_input)
 edit_menu.add_command(label="Find and Replace in Selection", command=find_replace_in_selection)
 
+find_str = ""
+replace_str = ""
 
  # Create a frame to hold the "File" menu and the custom widget
 menu_frame = tk.Frame(menu)
@@ -585,7 +608,8 @@ text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
 text.bind("<FocusIn>", auto_complete_combobox.hide_listbox)
 
-
+text.bind("<Control-h>", find_replace_in_selection)
+text.bind("<Control-f>", find_replace_in_selection)
 
 
 # Register the Text widget as a drop target for text files
