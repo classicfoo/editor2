@@ -16,10 +16,11 @@
 - Opens files when argument given
 - Drag and drop files to open
 - Customizable bullets when inserting into multiple lines
+- Text entry press tab/down key to select first item in listbox and press enter/click to select
+
 
 # Todo
 - Find and replace remembers last values
-- Text entry press tab/down key to select first item in listbox
 - Toggle Read-only
 - On window focus check for read only status and update (there may be 2 instances of the same file open)
 - Rename "prepend lines with input" to "insert custom bullet"
