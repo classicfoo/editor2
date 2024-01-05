@@ -20,21 +20,35 @@ class AutocompleteCombobox(tk.Frame):
         self.entry.bind("<KeyRelease>", self.on_keyrelease)
         self.entry.bind("<FocusIn>", highlight_selected_text)  # Bind FocusIn event to show listbox
         self.entry.bind("<FocusOut>", self.hide_listbox)  # Bind FocusIn event to hide listbox
+        self.entry.bind("<Tab>", self.on_entry_tab_key)
 
         self.listbox = tk.Listbox(self)
         self.listbox.grid(row=1, column=0)
         self.listbox.grid_forget()  # Initially hide the listbox
 
-        # Bind the listbox select event
-        self.listbox.bind("<<ListboxSelect>>", self.on_listbox_select)
+        self.listbox.bind("<Return>", self.on_return_pressed)  # Bind the <Return> key event
+        self.listbox.bind("<ButtonRelease-1>", self.on_return_pressed)  # Bind the <Return> key event
+
 
         self.update_listbox()
         self.listbox.bind("<FocusOut>", self.hide_listbox)
 
-    def on_keyrelease(self, event):
+    def on_keyrelease(self, event):        
         self.update_listbox()
         self.adjust_listbox_height()  # Adjust the listbox height based on the number of items
         self.listbox.grid()  # Show the listbox
+        if event.keysym == 'Down':
+            # Select the first item in self.listbox
+            self.listbox.focus()
+            self.listbox.select_set(0)
+
+    def on_entry_tab_key(self, event):
+        #self.listbox.focus()
+        self.listbox.select_set(0)
+        self.listbox.select_set(0)
+
+        #return "break"  # Prevent the Tab key press from propagating further
+
 
     def update_listbox(self):
         search_term = self.entry_var.get().lower()
@@ -44,10 +58,11 @@ class AutocompleteCombobox(tk.Frame):
                 self.listbox.insert(tk.END, item)
 
     def hide_listbox(self, event=None):
-        # Hide the listbox when it loses focus
-        self.listbox.grid_forget()
-        self.entry.delete(0, tk.END)
-        unhighlight_selected_text()
+        if event==None:
+            # Hide the listbox when it loses focus
+            self.listbox.grid_forget()
+            self.entry.delete(0, tk.END)
+            unhighlight_selected_text()
 
     def show_listbox(self, event):
         # Show the listbox when the entry is clicked again
@@ -56,7 +71,7 @@ class AutocompleteCombobox(tk.Frame):
         self.listbox.grid()
         highlight_selected_text()
 
-    def on_listbox_select(self, event):
+    def execute_command(self, event):
         # Get the current selection from the listbox
         selection = self.listbox.curselection()
         if selection:
@@ -73,6 +88,13 @@ class AutocompleteCombobox(tk.Frame):
         max_height = 10  # Maximum height of the listbox
         items = self.listbox.size()
         self.listbox.config(height=min(items, max_height))
+    
+    def on_return_pressed(self, event):
+        selected_index = self.listbox.curselection()
+        if selected_index:
+            selected_value = self.listbox.get(selected_index[0])
+            self.entry_var.set(selected_value)
+            self.execute_command(event)  # Call the on_listbox_select method
 
 
 current_file_path = None  # Initialize current_file_path as None
@@ -467,6 +489,7 @@ def create_toolbar(root):
     # Pass the edit_menu_commands dictionary to the AutocompleteCombobox
     autocomplete_combobox = AutocompleteCombobox(toolbar_frame, menu_commands)
     autocomplete_combobox.grid(row=0, column=0, padx=5, pady=5, sticky="w")
+    return autocomplete_combobox
 
 
 
@@ -543,7 +566,7 @@ menu_frame = tk.Frame(menu)
 menu_frame.grid(row=0, column=0, sticky="ew")
 
 # Create the toolbar with AutocompleteCombobox
-create_toolbar(root)
+auto_complete_combobox = create_toolbar(root)
 
 
 # Bind hotkeys
@@ -551,6 +574,9 @@ text.bind("<Control-n>", new_file)
 text.bind("<Control-s>", save_file)
 text.bind("<Control-o>", open_file)
 text.bind("<Control-BackSpace>", delete_word_backwards)
+text.bind("<FocusIn>", auto_complete_combobox.hide_listbox)
+
+
 
 
 # Register the Text widget as a drop target for text files
