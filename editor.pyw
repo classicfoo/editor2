@@ -247,6 +247,12 @@ def set_attribute_normal():
     new_title = current_title.replace(" - [READ-ONLY]", "")
     root.title(new_title)
 
+def toggle_readonly():
+    if is_read_only():
+        set_attribute_normal()
+    else:
+        set_attribute_readonly()
+
 def sentence_case():
     selected_text = text.get(tk.SEL_FIRST, tk.SEL_LAST)
     if selected_text:
@@ -478,6 +484,7 @@ def create_toolbar(root):
         "Sentence Case (With Bullets)": sentence_case_with_bullets,
         "Insert Bullets": add_bullets,
         "Insert Tabs": add_tabs,
+        "Toggle Read-Only": toggle_readonly,
         "Set Attribute Read-Only": set_attribute_readonly,
         "Set Attribute Normal": set_attribute_normal,
         "Prepend Lines with Input": prepend_lines_with_input,
