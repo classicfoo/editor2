@@ -22,10 +22,15 @@
 - Save as in file menu
 - Find and replace remembers last values
 - Rename "prepend lines with input" to "insert custom bullet"
-
+- Make width of listbox wider: make width of combobox as wide as longest value in listbox
+- Change max items in listbox from 10 to 100
+  
 # Todo
-- Make width of listbox wider
 - Follow indent pattern when pressing enter
+- Hide listbox when entry widget is focused
+- When an item is selected in listbox and it's focused, pressing tab brings it back to the entry widget
+- When text is selected and there is a dialog box and it's cancelled, the manually highlighted text should be unhighlighted
+
 
 ![image](https://github.com/classicfoo/editor2/assets/20607431/de546571-abf6-465a-a934-94d9350c1837)
 
