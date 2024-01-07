@@ -25,13 +25,14 @@ class AutocompleteCombobox(tk.Frame):
         self.listbox = tk.Listbox(self)
         self.listbox.grid(row=1, column=0)
         self.listbox.grid_forget()  # Initially hide the listbox
-
         self.listbox.bind("<Return>", self.on_return_pressed)  # Bind the <Return> key event
         self.listbox.bind("<ButtonRelease-1>", self.on_return_pressed)  # Bind the <Return> key event
 
 
         self.update_listbox()
         self.listbox.bind("<FocusOut>", self.hide_listbox)
+        self.set_listbox_width_to_longest_item()
+
 
     def on_keyrelease(self, event):        
         self.update_listbox()
@@ -56,6 +57,9 @@ class AutocompleteCombobox(tk.Frame):
         for item in self.values:
             if search_term in item.lower():
                 self.listbox.insert(tk.END, item)
+
+        self.set_listbox_width_to_longest_item()
+
 
     def hide_listbox(self, event=None):
         if event==None:
@@ -85,10 +89,28 @@ class AutocompleteCombobox(tk.Frame):
 
     def adjust_listbox_height(self):
         # Adjust the height of the listbox based on the number of items, up to a maximum
-        max_height = 10  # Maximum height of the listbox
+        max_height = 100  # Maximum height of the listbox
         items = self.listbox.size()
         self.listbox.config(height=min(items, max_height))
-    
+
+    def set_listbox_width_to_longest_item(self):
+        # Iterate through all items in the listbox
+        max_characters = 0
+        for item in self.listbox.get(0, tk.END):
+            # Calculate the number of characters in each item
+            num_characters = len(item)
+            if num_characters > max_characters:
+                max_characters = num_characters
+        
+        # Add some padding (e.g., 2 characters) to the max width
+        max_characters += 2
+        
+        # Set the width of the listbox to the maximum number of characters
+        self.entry.config(width=max_characters)
+        self.listbox.config(width=max_characters)
+        self.adjust_listbox_height()
+
+
     def on_return_pressed(self, event):
         selected_index = self.listbox.curselection()
         if selected_index:
