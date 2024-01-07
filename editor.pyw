@@ -105,9 +105,15 @@ class AutocompleteCombobox(tk.Frame):
         # Add some padding (e.g., 2 characters) to the max width
         max_characters += 2
         
+        # Ensure the width is at least a minimum number of characters
+        minimum_width = 15
+        if max_characters < minimum_width:
+            max_characters = minimum_width
+
         # Set the width of the listbox to the maximum number of characters
         self.entry.config(width=max_characters)
         self.listbox.config(width=max_characters)
+
         self.adjust_listbox_height()
 
 
