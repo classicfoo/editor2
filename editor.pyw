@@ -14,7 +14,7 @@ current_file_path = None  # Initialize current_file_path as None
 def find_replace_in_selection():
     # Get the current selection range
     sel_start = text.index(tk.SEL_FIRST)
-    sel_end = text.index(tk.SEL_LAST)
+    sel_end = text.index(tk.SEL_LAST + "+1c")  # Add "+1c" to include the last character
 
     # Get the selected text
     selected_text = text.get(sel_start, sel_end)
