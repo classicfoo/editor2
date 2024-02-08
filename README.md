@@ -18,6 +18,7 @@
 - Customizable bullets when inserting into multiple lines
 - Give option to Save As after notifying of error when trying to save a read only file
 - Rename current file
+- Copy current filename to clipboard
 - Copy current filepath to clipboard
 
 # Todo
