@@ -537,6 +537,7 @@ def create_toolbar(root):
         "Open": open_file,
         "Save": save_file,
         "Save As": save_as_file,
+        "Copy Filename": copy_filename,  
         "Copy File Path": copy_file_path,  
         "Rename File": rename_file,  
         "Capitalize Every Word": capitalize_selected_text,
@@ -557,6 +558,15 @@ def create_toolbar(root):
     autocomplete_combobox = AutocompleteCombobox(toolbar_frame, menu_commands)
     autocomplete_combobox.grid(row=0, column=0, padx=5, pady=5, sticky="w")
     return autocomplete_combobox
+
+def copy_filename():
+    global current_file_path
+
+    if current_file_path:
+        file_name = os.path.basename(current_file_path)
+        root.clipboard_clear()  # Clear the clipboard
+        root.clipboard_append(file_name)  # Append the filename to the clipboard
+        root.update()  # Update the clipboard content
 
 def rename_file():
     global current_file_path
@@ -581,7 +591,7 @@ def copy_file_path():
     if current_file_path:
         root.clipboard_clear()
         root.clipboard_append(current_file_path)
-        messagebox.showinfo("File Path Copied", "File path has been copied to clipboard.")
+        #messagebox.showinfo("File Path Copied", "File path has been copied to clipboard.")
 
 
 def check_selection():
