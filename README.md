@@ -17,10 +17,12 @@
 - Drag and drop files to open
 - Customizable bullets when inserting into multiple lines
 - Give option to Save As after notifying of error when trying to save a read only file
+- Rename current file
+- Copy current filepath to clipboard
 
 # Todo
 - Save as in file menu
 - Follow indent pattern when pressing enter
 
+![image](https://github.com/classicfoo/editor2/assets/20607431/fd6a8a06-3935-4f9c-867e-d41c3625fe01)
 
-![2023-10-31 18_40_37-Settings](https://github.com/classicfoo/editor2/assets/20607431/b1db5147-e65b-4054-aacd-0143aab6e355)
