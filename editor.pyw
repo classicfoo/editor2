@@ -135,6 +135,10 @@ class FindReplaceDialog(tk.Toplevel):
         self.title("Find and Replace")
         global find_str, replace_str
 
+        # make this the default
+        find_str = ","
+        replace_str = ", "
+
         self.find_label = tk.Label(self, text="Find:")
         self.find_label.pack()
 
