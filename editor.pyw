@@ -413,7 +413,7 @@ def open_file(event=None):
     global current_file_path
     file_path = filedialog.askopenfilename(parent=root, defaultextension=".txt")
     if file_path:
-        with open(file_path, 'r') as file:
+        with open(file_path, 'r', encoding='utf-8') as file:
             text.delete(1.0, tk.END)
             text.insert(tk.END, file.read())
         # Get the file name from the file path
@@ -433,7 +433,7 @@ def save_file(event=None):
         if is_read_only():
             messagebox.showerror("Read-only Error","Cannot save Read-only file.")
         else:
-            with open(current_file_path, 'w') as file:
+            with open(current_file_path, 'w', encoding='utf-8') as file:
                 file.write(text.get(1.0, tk.END))
     else:
         # Check if the first line of the text starts with '#'
@@ -446,7 +446,7 @@ def save_file(event=None):
             file_path = filedialog.asksaveasfilename(defaultextension=".txt")
         
         if file_path:
-            with open(file_path, 'w') as file:
+            with open(file_path, 'w', encoding='utf-8') as file:
                 file.write(text.get(1.0, tk.END))
             # Get the file name from the file path
             file_name = os.path.basename(file_path)
@@ -465,7 +465,7 @@ def save_as_file():
         file_path = filedialog.asksaveasfilename(defaultextension=".txt")
     
     if file_path:
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding='utf-8') as file:
             file.write(text.get(1.0, tk.END))
         # Get the file name from the file path
         file_name = os.path.basename(file_path)
