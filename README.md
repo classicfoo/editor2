@@ -20,7 +20,9 @@
 - Rename current file
 - Copy current filename to clipboard
 - Copy current filepath to clipboard
-
+- Spell Checker
+- Ability to toggle spell checker on and off
+  
 # Todo
 - Save as in file menu
 - Follow indent pattern when pressing enter
