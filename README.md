@@ -27,5 +27,4 @@
 - Save as in file menu
 - Follow indent pattern when pressing enter
 
-![image](https://github.com/classicfoo/editor2/assets/20607431/fd6a8a06-3935-4f9c-867e-d41c3625fe01)
-
+![image](https://github.com/classicfoo/editor2/assets/20607431/587948e1-8d8a-4bfd-8b7b-3f52a0788fcb)
