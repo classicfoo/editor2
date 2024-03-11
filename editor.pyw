@@ -7,6 +7,9 @@ import sys
 from tkinterdnd2 import DND_FILES, TkinterDnD
 import ctypes
 from tkinter import messagebox
+import enchant
+
+spell_checking_enabled = True  # Spell checking is enabled by default
 
 class AutocompleteCombobox(tk.Frame):
     def __init__(self, parent, values_commands):
@@ -170,6 +173,55 @@ class FindReplaceDialog(tk.Toplevel):
         self.find_value = self.find_entry.get()
         self.replace_value = self.replace_entry.get()
         self.destroy()
+
+def toggle_spell_checking():
+    global spell_checking_enabled
+    spell_checking_enabled = not spell_checking_enabled
+    if spell_checking_enabled:
+        highlight_misspelled_words()
+    else:
+        text.tag_remove("spell_error", "1.0", "end")
+        # Optionally, clear the existing highlights
+
+def spell_check(text):
+    # Ignores punctuation and special characters when checking for misspelled words
+    words = re.findall(r"\b[\w']+\b", text) 
+    
+    misspelled_words = []
+    for word in words:
+        if not dictionary.check(word):
+            misspelled_words.append(word)
+    return misspelled_words
+
+def highlight_misspelled_words(event=None):
+
+    if not spell_checking_enabled:
+        return  # Exit the function if spell checking is disabled
+    
+    # Use a different variable to store the text content, not 'text'
+    text_content = text.get("1.0", "end-1c")
+    misspelled_words = spell_check(text_content)
+    
+    # Configure the 'spell_error' tag to underline with red color
+    text.tag_config("spell_error", underline=True, underlinefg="red")
+    
+    # Use 'text' widget methods as intended
+    text.tag_remove("spell_error", "1.0", "end")
+    for word in misspelled_words:
+        start_index = '1.0'
+        while True:
+            # Modify the search to look for word boundaries
+            # '\m' and '\M' are word boundaries in Tkinter text search
+            start_index = text.search(r'\m' + word + r'\M', start_index, stopindex=tk.END, regexp=True)
+            if not start_index:
+                break
+            end_index = f"{start_index}+{len(word)}c"
+            text.tag_add("spell_error", start_index, end_index)
+            start_index = end_index  # Move start index for the next search
+    text.update_idletasks()
+
+
+
 
 def highlight_selected_text(event=None):
     text.tag_configure("highlight", background="#0078D7",foreground="#FFFFFF")
@@ -554,6 +606,7 @@ def create_toolbar(root):
         "Set Attribute Read-Only": set_attribute_readonly,
         "Set Attribute Normal": set_attribute_normal,
         "Find and Replace in Selection": find_replace_in_selection,
+        "Toggle Spell Checking": toggle_spell_checking,
         # Add other edit menu items and their corresponding functions here
     }
 
@@ -627,6 +680,7 @@ center_window(root)
 # Create a text widget with a fixed size
 text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1, exportselection=False)
 
+dictionary = enchant.Dict("en_AU")  # Change "en_US" to your preferred language
 
 # Create vertical scrollbar
 vertical_scrollbar = tk.Scrollbar(root, command=text.yview)
@@ -698,6 +752,17 @@ text.bind("<FocusIn>", auto_complete_combobox.hide_listbox)
 text.bind("<Control-h>", find_replace_in_selection)
 text.bind("<Control-f>", find_replace_in_selection)
 text.bind("<Control-p>", auto_complete_combobox.focus_entry)
+
+# Bind the spacebar, punctuation, and Enter key to the spell checking function
+text.bind("<space>", highlight_misspelled_words)  # Spacebar
+text.bind("<period>", highlight_misspelled_words)  # Period
+text.bind("<comma>", highlight_misspelled_words)  # Comma
+text.bind("<Return>", highlight_misspelled_words)  # Enter key
+
+# Bind paste event
+text.bind("<<Paste>>", lambda event: text.after(1, highlight_misspelled_words))
+
+
 
 # Register the Text widget as a drop target for text files
 text.drop_target_register(DND_FILES)
