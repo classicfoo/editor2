@@ -754,10 +754,12 @@ text.bind("<Control-f>", find_replace_in_selection)
 text.bind("<Control-p>", auto_complete_combobox.focus_entry)
 
 # Bind the spacebar, punctuation, and Enter key to the spell checking function
-text.bind("<space>", highlight_misspelled_words)  # Spacebar
-text.bind("<period>", highlight_misspelled_words)  # Period
-text.bind("<comma>", highlight_misspelled_words)  # Comma
-text.bind("<Return>", highlight_misspelled_words)  # Enter key
+# text.bind("<space>", highlight_misspelled_words)  # Spacebar
+# text.bind("<period>", highlight_misspelled_words)  # Period
+# text.bind("<comma>", highlight_misspelled_words)  # Comma
+# text.bind("<Return>", highlight_misspelled_words)  # Enter key
+text.bind("<KeyRelease>", highlight_misspelled_words)
+
 
 # Bind paste event
 text.bind("<<Paste>>", lambda event: text.after(1, highlight_misspelled_words))
