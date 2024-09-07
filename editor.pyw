@@ -8,6 +8,10 @@ from tkinterdnd2 import DND_FILES, TkinterDnD
 import ctypes
 from tkinter import messagebox
 import enchant
+from difflib import get_close_matches
+from tkinter import Menu
+import tkinter.ttk as ttk
+
 
 spell_checking_enabled = True  # Spell checking is enabled by default
 
@@ -184,44 +188,119 @@ def toggle_spell_checking():
         # Optionally, clear the existing highlights
 
 def spell_check(text):
-    # Ignores punctuation and special characters when checking for misspelled words
-    words = re.findall(r"\b[\w']+\b", text) 
+    words = re.findall(r"\b[\w']+\b", text)
     
     misspelled_words = []
     for word in words:
         if not dictionary.check(word):
-            misspelled_words.append(word)
+            #suggestions = get_close_matches(word, dictionary.suggest(word), n=5, cutoff=0.6)
+            misspelled_words.append((word))
     return misspelled_words
 
 def highlight_misspelled_words(event=None):
-
     if not spell_checking_enabled:
-        return  # Exit the function if spell checking is disabled
-    
-    # Use a different variable to store the text content, not 'text'
+        return
+
     text_content = text.get("1.0", "end-1c")
     misspelled_words = spell_check(text_content)
     
-    # Configure the 'spell_error' tag to underline with red color
     text.tag_config("spell_error", underline=True, underlinefg="red")
-    
-    # Use 'text' widget methods as intended
     text.tag_remove("spell_error", "1.0", "end")
+
     for word in misspelled_words:
         start_index = '1.0'
         while True:
-            # Modify the search to look for word boundaries
-            # '\m' and '\M' are word boundaries in Tkinter text search
             start_index = text.search(r'\m' + word + r'\M', start_index, stopindex=tk.END, regexp=True)
             if not start_index:
                 break
             end_index = f"{start_index}+{len(word)}c"
             text.tag_add("spell_error", start_index, end_index)
-            start_index = end_index  # Move start index for the next search
+            start_index = end_index
+
     text.update_idletasks()
 
+def select_word_at_cursor(text_widget):
+    # Get the current line and column
+    line, col = map(int, text_widget.index("insert").split('.'))
+    
+    # Get the line's content
+    line_content = text_widget.get(f"{line}.0", f"{line}.end")
+    
+    # Find word boundaries
+    left = right = col
+    while left > 0 and line_content[left-1].isalnum():
+        left -= 1
+    while right < len(line_content) and line_content[right].isalnum():
+        right += 1
+    
+    # Select the word
+    text_widget.tag_remove("sel", "1.0", "end")
+    text_widget.tag_add("sel", f"{line}.{left}", f"{line}.{right}")
+    
+    # Force the widget to update visually
+    text_widget.update_idletasks()
+
+def show_context_menu(event):
+    text.event_generate("<Button-1>", x=event.x, y=event.y)
+    
+    select_word_at_cursor(text)
+    
+    try:
+        word = text.get("sel.first", "sel.last")
+    except tk.TclError:
+        return show_default_context_menu(event)
+
+    if word and not dictionary.check(word):
+        suggestions = get_close_matches(word, dictionary.suggest(word), n=5, cutoff=0.6)
+        context_menu = Menu(root, tearoff=0)
+        context_menu.add_command(label=f"Suggestions for '{word}':", state="disabled")
+        context_menu.add_separator()
+        
+        for suggestion in suggestions:
+            context_menu.add_command(label=suggestion, command=lambda s=suggestion: replace_word(s))
+        
+        context_menu.add_separator()
+        context_menu.add_command(label="Add To My Words", command=lambda: ignore_word(word))
+        
+        text.tag_add("sel", "sel.first", "sel.last")
+        
+        context_menu.tk_popup(event.x_root, event.y_root)
+        return "break"
+    else:
+        show_default_context_menu(event)
+
+def replace_word(new_word):
+    text.replace("sel.first", "sel.last", new_word)
+    highlight_misspelled_words()
+
+def ignore_word(word):
+    dictionary.add(word)
+    highlight_misspelled_words()
+
+def show_default_context_menu(event):
+    default_menu = Menu(root, tearoff=0)
+    default_menu.add_command(label="Cut", command=lambda: text.event_generate("<<Cut>>"))
+    default_menu.add_command(label="Copy", command=lambda: text.event_generate("<<Copy>>"))
+    default_menu.add_command(label="Paste", command=lambda: text.event_generate("<<Paste>>"))
+    default_menu.tk_popup(event.x_root, event.y_root)
+    return "break"  # Prevent the default context menu from appearing
 
 
+
+def replace_word(new_word):
+    text.replace("sel.first", "sel.last", new_word)
+    highlight_misspelled_words()
+
+def ignore_word(word):
+    dictionary.add(word)
+    highlight_misspelled_words()
+
+def show_default_context_menu(event):
+    default_menu = Menu(root, tearoff=0)
+    default_menu.add_command(label="Cut", command=lambda: text.event_generate("<<Cut>>"))
+    default_menu.add_command(label="Copy", command=lambda: text.event_generate("<<Copy>>"))
+    default_menu.add_command(label="Paste", command=lambda: text.event_generate("<<Paste>>"))
+    default_menu.tk_popup(event.x_root, event.y_root)
 
 def highlight_selected_text(event=None):
     text.tag_configure("highlight", background="#0078D7",foreground="#FFFFFF")
@@ -662,6 +741,43 @@ def check_selection():
     except tk.TclError as e:
         messagebox.showerror("Error", f"An error occurred: {str(e)}")
 
+def show_custom_words_dialog():
+    dialog = tk.Toplevel(root)
+    dialog.title("Manage Custom Words")
+    dialog.geometry("300x400")
+    dialog.transient(root)
+    dialog.grab_set()
+
+    listbox = tk.Listbox(dialog, width=40, height=15)
+    listbox.pack(pady=10, padx=10)
+
+    with open("mywords.txt", "r") as f:
+        custom_words = [line.strip() for line in f]
+
+    # Populate the listbox with custom words
+    for word in custom_words:
+        listbox.insert(tk.END, word)
+
+    def remove_selected_word():
+        selection = listbox.curselection()
+        if selection:
+            word = listbox.get(selection[0])
+            if messagebox.askyesno("Confirm", f"Remove '{word}' from custom dictionary?"):
+                dictionary.remove(word)
+                custom_words.remove(word)
+                listbox.delete(selection[0])
+
+    remove_button = ttk.Button(dialog, text="Remove Selected", command=remove_selected_word)
+    remove_button.pack(pady=5)
+
+    close_button = ttk.Button(dialog, text="Close", command=dialog.destroy)
+    close_button.pack(pady=10)
+
+    # Ensure the dialog is modal
+    dialog.focus_set()
+    dialog.wait_window(dialog)
+
+
 # Create the main window
 root = TkinterDnD.Tk()
 root.title("Editor")
@@ -680,7 +796,7 @@ center_window(root)
 # Create a text widget with a fixed size
 text = tk.Text(root, font=("Consolas", 11), width=1000, height=1000, wrap="word", undo=True, autoseparators=True, maxundo=-1, exportselection=False)
 
-dictionary = enchant.Dict("en_AU")  # Change "en_US" to your preferred language
+dictionary = enchant.DictWithPWL("en_AU", "mywords.txt")  # Change "en_US" to your preferred language
 
 # Create vertical scrollbar
 vertical_scrollbar = tk.Scrollbar(root, command=text.yview)
@@ -731,6 +847,12 @@ edit_menu.add_command(label="Set Attribute Normal ", command=set_attribute_norma
 edit_menu.add_command(label="Insert Custom Bullet", command=insert_custom_bullet)
 edit_menu.add_command(label="Find and Replace in Selection", command=find_replace_in_selection)
 
+# Add this to your menu
+tools_menu = tk.Menu(menu, tearoff=False)
+menu.add_cascade(label="Tools", menu=tools_menu)
+tools_menu.add_command(label="Manage Custom Words", command=show_custom_words_dialog)
+
+
 find_str = ""
 replace_str = ""
 
@@ -753,18 +875,16 @@ text.bind("<Control-h>", find_replace_in_selection)
 text.bind("<Control-f>", find_replace_in_selection)
 text.bind("<Control-p>", auto_complete_combobox.focus_entry)
 
-# Bind the spacebar, punctuation, and Enter key to the spell checking function
-# text.bind("<space>", highlight_misspelled_words)  # Spacebar
-# text.bind("<period>", highlight_misspelled_words)  # Period
+
 # text.bind("<comma>", highlight_misspelled_words)  # Comma
 # text.bind("<Return>", highlight_misspelled_words)  # Enter key
 text.bind("<KeyRelease>", highlight_misspelled_words)
 
+# Bind the right-click event to show the context menu
+text.bind("<Button-3>", show_context_menu)
 
 # Bind paste event
 text.bind("<<Paste>>", lambda event: text.after(1, highlight_misspelled_words))
-
-
 
 # Register the Text widget as a drop target for text files
 text.drop_target_register(DND_FILES)
