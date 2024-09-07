@@ -22,6 +22,8 @@
 - Copy current filename to clipboard
 - Copy current filepath to clipboard
 - Spell Checker
+- Spelling suggester
+- Autoformat (automatically does grammar)
   
 # Todo
 - Save as in file menu
