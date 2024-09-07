@@ -777,6 +777,37 @@ def show_custom_words_dialog():
     dialog.focus_set()
     dialog.wait_window(dialog)
 
+def auto_format(event):
+    current_line = text.get("insert linestart", "insert lineend")
+    
+    # Rule 1: Capitalize every word for markdown headings
+    if current_line.strip().startswith('#'):
+        formatted_line = ' '.join(word.capitalize() for word in current_line.split())
+    else:
+        # Rule 2: Apply sentence case
+        formatted_line = sentence_case_line(current_line)
+    
+    # Rule 3: Capitalize standalone 'i'
+    formatted_line = re.sub(r'\bi\b', 'I', formatted_line)
+    
+    # Rule 4: Add a full stop if not present and not a heading, and trim the line
+    formatted_line = formatted_line.strip()  # Trim the line
+    if formatted_line and not formatted_line.startswith('#') and not formatted_line.endswith(('.', '!', '?')):
+        formatted_line += '.'
+        
+    # Replace the current line with the formatted line
+    text.delete("insert linestart", "insert lineend")
+    text.insert("insert linestart", formatted_line)
+    
+    # Move cursor to the next line
+    text.insert("insert", "\n")
+    return "break"  # Prevents the default Enter behavior
+
+def sentence_case_line(line):
+    if not line:
+        return line
+    return line[0].upper() + line[1:].lower()
+
 
 # Create the main window
 root = TkinterDnD.Tk()
@@ -889,6 +920,9 @@ text.bind("<<Paste>>", lambda event: text.after(1, highlight_misspelled_words))
 # Register the Text widget as a drop target for text files
 text.drop_target_register(DND_FILES)
 text.dnd_bind('<<Drop>>', open_dropped_text_file)
+
+# Bind the auto_format function to the Enter key
+text.bind("<Return>", auto_format)
 
 # open any files that were passed to it as arguments
 if len(sys.argv) > 1:
